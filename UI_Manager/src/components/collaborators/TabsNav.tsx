@@ -19,58 +19,28 @@ const tabs = [
 export default function TabsNav() {
   const pathname = usePathname();
   return (
-    <div style={{ display: "flex", gap: 0, margin: '10px 10px 0 10px', background: '#f4f6fb', borderRadius: 10, padding: 4, alignItems: 'center', minWidth: 0 }}>
+    <div className="flex gap-4 px-4 py-4">
       {tabs.map((tab) => {
         const isActive = pathname === tab.href;
         return (
           <Link
             key={tab.href}
             href={tab.href}
-            style={{
-              padding: "5px 10px",
-              borderRadius: 7,
-              background: isActive ? "#2563eb" : "#f1f5f9",
-              color: isActive ? "#fff" : "#222",
-              fontWeight: isActive ? 700 : 500,
-              border: "none",
-              marginRight: 3,
-              fontSize: 13,
-              boxShadow: isActive ? "0 2px 8px #2563eb22" : undefined,
-              transition: "all 0.15s",
-              cursor: 'pointer',
-              minWidth: 'fit-content',
-              textAlign: 'center',
-            }}
-            onMouseEnter={e => {
-              if (!isActive) {
-                e.currentTarget.style.background = "#e0e7ef";
-                e.currentTarget.style.color = "#2563eb";
-              }
-            }}
-            onMouseLeave={e => {
-              if (!isActive) {
-                e.currentTarget.style.background = "#f1f5f9";
-                e.currentTarget.style.color = "#222";
-              }
-            }}
+            className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
+              isActive 
+                ? "border-blue-600 text-blue-600 font-semibold" 
+                : "border-transparent text-gray-500 font-medium hover:text-blue-600 hover:border-blue-300"
+            }`}
           >
-            {tab.label}
+            <span className="text-sm">{tab.label}</span>
             {typeof tab.count === 'number' && (
-              <span style={{
-                marginLeft: 6,
-                background: '#fff',
-                color: '#2563eb',
-                fontWeight: 700,
-                borderRadius: 8,
-                padding: '0 7px',
-                fontSize: 12,
-                minWidth: 18,
-                display: 'inline-block',
-                textAlign: 'center',
-                boxShadow: '0 1px 4px #2563eb11'
-              }}>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+                isActive 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-gray-200 text-gray-500 hover:bg-blue-100 hover:text-blue-600"
+              }`}>
                 {tab.count}
-              </span>
+              </div>
             )}
           </Link>
         );

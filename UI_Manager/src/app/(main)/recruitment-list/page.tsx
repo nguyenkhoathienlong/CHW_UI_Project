@@ -18,7 +18,7 @@ const mockApplications = [
     position: "Cộng tác viên y tế cộng đồng",
     project: "Chương trình tầm soát ung thư cổ tử cung",
     appliedDate: "2024-06-01",
-    status: "Đang xem xét",
+    status: "Chờ xử lý",
     statusColor: "yellow",
   },
   {
@@ -38,7 +38,7 @@ const mockApplications = [
     position: "Cộng tác viên tuyên truyền y tế",
     project: "Chương trình phòng chống sốt xuất huyết",
     appliedDate: "2024-06-03",
-    status: "Từ chối",
+    status: "Đã từ chối",
     statusColor: "red",
   },
   {
@@ -48,17 +48,24 @@ const mockApplications = [
     position: "Nhân viên hỗ trợ y tế dự phòng",
     project: "Chương trình tiêm chủng mở rộng",
     appliedDate: "2024-06-04",
-    status: "Đang xem xét",
+    status: "Chờ xử lý",
     statusColor: "yellow",
+  },
+  {
+    id: 5,
+    collaboratorId: "CTV105",
+    candidateName: "Hoàng Văn E",
+    position: "Cộng tác viên y tế cộng đồng",
+    project: "Chương trình phòng chống dịch bệnh",
+    appliedDate: "2024-06-05",
+    status: "Đã duyệt",
+    statusColor: "green",
   },
 ];
 
-const statusOptions = [
-  { value: "", label: "Tất cả trạng thái" },
-  { value: "Đang xem xét", label: "Đang xem xét" },
-  { value: "Đã duyệt", label: "Đã duyệt" },
-  { value: "Từ chối", label: "Từ chối" },
-];
+// Lấy danh sách unique positions và projects
+const uniquePositions = [...new Set(mockApplications.map(app => app.position))];
+const uniqueProjects = [...new Set(mockApplications.map(app => app.project))];
 
 function getStatusBadge(status: string, color: string) {
   let style = {};
@@ -80,82 +87,160 @@ function formatDate(dateStr: string) {
 export default function ApplicationsListPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [positionFilter, setPositionFilter] = useState("");
+  const [projectFilter, setProjectFilter] = useState("");
   const { collapsed } = useContext(SidebarContext);
-  const marginLeft = collapsed ? 44 : 250;
 
+  // Tính toán số lượng theo trạng thái
+  const total = mockApplications.length;
+  const pending = mockApplications.filter(a => a.status === "Chờ xử lý").length;
+  const approved = mockApplications.filter(a => a.status === "Đã duyệt").length;
+  const rejected = mockApplications.filter(a => a.status === "Đã từ chối").length;
+
+  // Lọc dữ liệu theo tab đang chọn và các filter
   const filtered = useMemo(() => {
-    return mockApplications.filter(app => {
+    let filteredData = mockApplications.filter(app => {
       const matchSearch =
         search === "" ||
         app.candidateName.toLowerCase().includes(search.toLowerCase()) ||
-        app.position.toLowerCase().includes(search.toLowerCase());
-      const matchStatus = statusFilter === "" || app.status === statusFilter;
-      return matchSearch && matchStatus;
+        app.position.toLowerCase().includes(search.toLowerCase()) ||
+        app.project.toLowerCase().includes(search.toLowerCase());
+      
+      const matchPosition = positionFilter === "" || app.position === positionFilter;
+      const matchProject = projectFilter === "" || app.project === projectFilter;
+      
+      return matchSearch && matchPosition && matchProject;
     });
-  }, [search, statusFilter]);
 
-  // Tổng hợp số lượng theo trạng thái
-  const total = mockApplications.length;
-  const reviewing = mockApplications.filter(a => a.status === "Đang xem xét").length;
-  const approved = mockApplications.filter(a => a.status === "Đã duyệt").length;
-  const rejected = mockApplications.filter(a => a.status === "Từ chối").length;
+    // Lọc theo tab
+    if (activeTab === "pending") {
+      filteredData = filteredData.filter(app => app.status === "Chờ xử lý");
+    } else if (activeTab === "approved") {
+      filteredData = filteredData.filter(app => app.status === "Đã duyệt");
+    } else if (activeTab === "rejected") {
+      filteredData = filteredData.filter(app => app.status === "Đã từ chối");
+    }
+    // "all" tab hiển thị tất cả
+
+    return filteredData;
+  }, [search, activeTab, positionFilter, projectFilter]);
 
   return (
     <div className={`w-full p-6 bg-[#f4f6fb] min-h-screen rounded-2xl transition-all duration-200`}>
       <h1 className="font-bold text-2xl text-[#222] mb-1 tracking-tight">Quản lý đơn ứng tuyển</h1>
       <div className="text-[#64748b] text-base mb-5">Theo dõi, xét duyệt và quản lý các đơn ứng tuyển vào vị trí của đơn vị bạn.</div>
-      {/* Card tổng quan */}
-      <div className="flex gap-4 mb-5 flex-wrap">
-        <Card className="flex-1 flex items-center gap-3 p-5 rounded-2xl shadow bg-white border border-[#e5e7eb]">
-          <Users className="w-8 h-8 text-blue-600 bg-blue-100 rounded-lg p-1" />
-          <div>
-            <div className="font-bold text-lg text-[#222]">{total}</div>
-            <div className="text-xs text-[#64748b]">Tổng đơn ứng tuyển</div>
+      
+      {/* Horizontal Tabs */}
+      <div className="flex gap-4 mb-4 rounded-2xl p-0">
+        <div 
+          onClick={() => setActiveTab("all")}
+          className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
+            activeTab === "all" 
+              ? "border-blue-600 text-blue-600 font-semibold" 
+              : "border-transparent text-gray-500 font-medium hover:text-blue-600 hover:border-blue-300"
+          }`}
+        >
+          <span className="text-sm">Tất cả</span>
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+            activeTab === "all" 
+              ? "bg-blue-600 text-white" 
+              : "bg-gray-200 text-gray-500 hover:bg-blue-100 hover:text-blue-600"
+          }`}>
+            {total}
           </div>
-        </Card>
-        <Card className="flex-1 flex items-center gap-3 p-5 rounded-2xl shadow bg-white border border-[#e5e7eb]">
-          <Clock className="w-8 h-8 text-yellow-700 bg-yellow-100 rounded-lg p-1" />
-          <div>
-            <div className="font-bold text-lg text-yellow-700">{reviewing}</div>
-            <div className="text-xs text-yellow-700">Đang xem xét</div>
-          </div>
-        </Card>
-        <Card className="flex-1 flex items-center gap-3 p-5 rounded-2xl shadow bg-white border border-[#e5e7eb]">
-          <CheckCircle className="w-8 h-8 text-green-600 bg-green-100 rounded-lg p-1" />
-          <div>
-            <div className="font-bold text-lg text-green-600">{approved}</div>
-            <div className="text-xs text-green-600">Đã duyệt</div>
-          </div>
-        </Card>
-        <Card className="flex-1 flex items-center gap-3 p-5 rounded-2xl shadow bg-white border border-[#e5e7eb]">
-          <AlertCircle className="w-8 h-8 text-red-600 bg-red-100 rounded-lg p-1" />
-          <div>
-            <div className="font-bold text-lg text-red-600">{rejected}</div>
-            <div className="text-xs text-red-600">Từ chối</div>
-          </div>
-        </Card>
-      </div>
-      {/* Bộ lọc & tìm kiếm */}
-      <Card className="bg-white rounded-2xl shadow border border-[#e5e7eb] w-full min-h-[500px] mb-5">
-        <div className="flex gap-3 items-center p-5 flex-wrap">
-          <Input
-            placeholder="Tìm kiếm ứng viên, vị trí..."
-            className="max-w-xs text-sm h-8 px-2 bg-white border border-[#e5e7eb]"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="text-sm h-8 border border-[#e5e7eb] rounded px-3 bg-white font-medium"
-          >
-            {statusOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
         </div>
-        <div className="px-0 pb-5 overflow-x-auto w-full">
+        
+        <div 
+          onClick={() => setActiveTab("pending")}
+          className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
+            activeTab === "pending" 
+              ? "border-yellow-500 text-yellow-500 font-semibold" 
+              : "border-transparent text-gray-500 font-medium hover:text-yellow-600 hover:border-yellow-300"
+          }`}
+        >
+          <span className="text-sm">Chờ xử lý</span>
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+            activeTab === "pending" 
+              ? "bg-yellow-500 text-white" 
+              : "bg-gray-200 text-gray-500 hover:bg-yellow-100 hover:text-yellow-600"
+          }`}>
+            {pending}
+          </div>
+        </div>
+        
+        <div 
+          onClick={() => setActiveTab("approved")}
+          className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
+            activeTab === "approved" 
+              ? "border-green-600 text-green-600 font-semibold" 
+              : "border-transparent text-gray-500 font-medium hover:text-green-600 hover:border-green-300"
+          }`}
+        >
+          <span className="text-sm">Đã duyệt</span>
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+            activeTab === "approved" 
+              ? "bg-green-600 text-white" 
+              : "bg-gray-200 text-gray-500 hover:bg-green-100 hover:text-green-600"
+          }`}>
+            {approved}
+          </div>
+        </div>
+        
+        <div 
+          onClick={() => setActiveTab("rejected")}
+          className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
+            activeTab === "rejected" 
+              ? "border-red-600 text-red-600 font-semibold" 
+              : "border-transparent text-gray-500 font-medium hover:text-red-600 hover:border-red-300"
+          }`}
+        >
+          <span className="text-sm">Đã từ chối</span>
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+            activeTab === "rejected" 
+              ? "bg-red-600 text-white" 
+              : "bg-gray-200 text-gray-500 hover:bg-red-100 hover:text-red-600"
+          }`}>
+            {rejected}
+          </div>
+        </div>
+      </div>
+
+      {/* Search & Filter Row */}
+      <div className="flex gap-3 items-center mb-5">
+        <Input
+          placeholder="Nhập ký tự tìm kiếm..."
+          className="max-w-xs text-sm px-4 bg-white border border-[#e5e7eb]"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        
+        <select
+          value={positionFilter}
+          onChange={e => setPositionFilter(e.target.value)}
+          className="text-sm h-8 px-2 bg-white border border-[#e5e7eb] rounded-[5px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">Tất cả vị trí</option>
+          {uniquePositions.map(position => (
+            <option key={position} value={position}>{position}</option>
+          ))}
+        </select>
+        
+        <select
+          value={projectFilter}
+          onChange={e => setProjectFilter(e.target.value)}
+          className="text-sm h-8 px-4 bg-white border border-[#e5e7eb] rounded-[5px] focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">Tất cả chương trình/dự án</option>
+          {uniqueProjects.map(project => (
+            <option key={project} value={project}>{project}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Table Card */}
+      <Card className="bg-white rounded-2xl shadow border border-[#e5e7eb] w-full min-h-[500px] mb-5">
+        <div className="p-5 overflow-x-auto w-full">
           <Table className="min-w-[900px] w-full">
             <TableHeader>
               <TableRow className="bg-[#f8fafc] text-sm">

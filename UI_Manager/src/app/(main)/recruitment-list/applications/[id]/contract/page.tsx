@@ -180,7 +180,7 @@ export default function ContractCreationPage() {
                     value={contractData.contractCode}
                     onChange={e => handleInputChange('contractCode', e.target.value)}
                     placeholder="VD: HD-2024-001"
-                    className="w-full px-3 py-2 border border-[#d1d5db] text-[14px]"
+                    className="w-full px-3 border border-[#d1d5db] text-[14px]"
                   />
                 </div>
                 <div>
@@ -201,7 +201,7 @@ export default function ContractCreationPage() {
                   <select
                     value={contractData.contractType}
                     onChange={e => handleInputChange('contractType', e.target.value)}
-                    className="w-full px-3 py-2 border border-[#d1d5db] text-[14px] bg-white"
+                    className="w-full px-3 h-8 border border-[#d1d5db] text-[14px] bg-white rounded-[5px]"
                   >
                     <option value="full-time">Toàn thời gian</option>
                     <option value="part-time">Bán thời gian</option>
@@ -216,7 +216,7 @@ export default function ContractCreationPage() {
                   <select
                     value={contractData.level || ''}
                     onChange={e => handleInputChange('level', e.target.value)}
-                    className="w-full px-3 py-2 border border-[#d1d5db] rounded-[5px] text-[14px] bg-white"
+                    className="w-full px-3 h-8 border border-[#d1d5db] rounded-[5px] text-[14px] bg-white rounded-[5px]"
                   >
                     <option value="">Chọn cấp bậc</option>
                     <option value="cong-tac-vien">Cộng tác viên</option>
@@ -231,7 +231,7 @@ export default function ContractCreationPage() {
                   <select
                     value={contractData.probationPeriod}
                     onChange={e => handleInputChange('probationPeriod', e.target.value)}
-                    className="w-full px-3 py-2 border border-[#d1d5db] rounded-[5px] text-[14px] bg-white"
+                    className="w-full px-3 h-8 border border-[#d1d5db] rounded-[5px] text-[14px] bg-white"
                   >
                     <option value="0">Không thử việc</option>
                     <option value="1">1 tháng</option>
@@ -312,7 +312,7 @@ export default function ContractCreationPage() {
                 </div>
                 <div>
                   <label className="block text-[14px] font-semibold text-[#374151] mb-1">
-                    Lịch làm việc
+                    Thời gian làm việc
                   </label>
                   <Input
                     value={contractData.workSchedule}
