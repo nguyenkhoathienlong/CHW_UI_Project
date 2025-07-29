@@ -16,6 +16,7 @@ import {
   Clock,
   Calendar
 } from 'lucide-react';
+import Link from 'next/link';
 
 // Danh sách ứng tuyển giống trang applications/page.tsx
 const applications = [
@@ -25,9 +26,9 @@ const applications = [
     company: 'Bệnh viện Đa khoa Hà Nội',
     location: 'Hà Nội',
     appliedDate: '20/12/2024',
-    status: 'Đang xem xét',
+    status: 'Chờ xử lý',
     statusColor: 'yellow',
-    salary: '8-12 triệu',
+    salary: '8.000.000 - 12.000.000',
     deadline: '30/12/2024',
     cv: 'CV_NguyenVanA.pdf',
     certificates: [
@@ -44,7 +45,7 @@ const applications = [
     appliedDate: '18/12/2024',
     status: 'Đã duyệt',
     statusColor: 'green',
-    salary: '7-10 triệu',
+    salary: '7.000.000 - 10.000.000',
     deadline: '25/12/2024',
     cv: 'CV_NguyenVanA_Updated.pdf',
     certificates: [
@@ -60,9 +61,9 @@ const applications = [
     company: 'Sở Y tế Đà Nẵng',
     location: 'Đà Nẵng',
     appliedDate: '15/12/2024',
-    status: 'Từ chối',
+    status: 'Đã từ chối',
     statusColor: 'red',
-    salary: '6-9 triệu',
+    salary: '6.000.000 - 9.000.000',
     deadline: '20/12/2024',
     cv: 'CV_NguyenVanA.pdf',
     certificates: [
@@ -76,9 +77,9 @@ const applications = [
     company: 'Trung tâm Kiểm soát Bệnh tật',
     location: 'Hà Nội',
     appliedDate: '12/12/2024',
-    status: 'Đang xem xét',
-    statusColor: 'yellow',
-    salary: '9-13 triệu',
+    status: 'Đã có hợp đồng',
+    statusColor: 'blue',
+    salary: '9.000.000 - 13.000.000',
     deadline: '28/12/2024',
     cv: 'CV_NguyenVanA_Specialized.pdf',
     certificates: [
@@ -86,7 +87,8 @@ const applications = [
       'Chứng chỉ đào tạo nâng cao',
       'Chứng chỉ sơ cấp cứu'
     ],
-    coverLetter: 'Tôi có kiến thức về dịch tễ học và mong muốn được tham gia...'
+    coverLetter: 'Tôi có kiến thức về dịch tễ học và mong muốn được tham gia...',
+    contractId: 1 // Added for new status
   }
 ];
 
@@ -99,6 +101,8 @@ const getStatusColor = (statusColor: string) => {
       return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     case 'red':
       return 'bg-red-100 text-red-800 border-red-200';
+    case 'blue':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-200';
   }
@@ -107,8 +111,8 @@ const getStatusColor = (statusColor: string) => {
 export default function ApplicationDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const applicationId = Number(params.id);
-  const application = applications.find(app => app.id === applicationId);
+  const id = Number(params?.id);
+  const application = applications.find(app => app.id === id);
 
   if (!application) return <div className="text-center text-red-500 py-10">Không tìm thấy đơn ứng tuyển</div>;
 
@@ -384,6 +388,15 @@ export default function ApplicationDetailPage() {
           </Card>
         </div>
       </div>
+      {/* Nút xem hợp đồng nếu đã có hợp đồng */}
+      {application.status === 'Đã có hợp đồng' && application.contractId && (
+        <Link href={`/profile/contract/${application.contractId}`}>
+          <Button className="mt-4 w-full">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4 -4" /></svg>
+            Xem hợp đồng
+          </Button>
+        </Link>
+      )}
     </div>
   );
 } 

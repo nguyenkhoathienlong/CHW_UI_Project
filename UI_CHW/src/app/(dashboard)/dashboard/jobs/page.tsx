@@ -26,6 +26,7 @@ import {
 import JobFilterBar from '@/components/jobs/JobFilterBar';
 import { jobPositions, jobTypes, jobExperiences } from '@/constants/jobFilterOptions';
 import { jobs } from '@/constants/jobsData';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 export default function JobsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -137,44 +138,100 @@ export default function JobsPage() {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(filteredJobs.length / rowsPerPage);
   const paginatedJobs = filteredJobs.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const [showFilter, setShowFilter] = useState(false);
 
   return (
     <>
-      {/* Tiêu đề tìm kiếm và lọc */}
       <h2 className="text-lg md:text-xl font-semibold text-[#2563eb] mb-3 ml-1">Tìm kiếm công việc & vị trí phù hợp với bạn</h2>
-      <JobFilterBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        selectedPosition={selectedPosition}
-        setSelectedPosition={setSelectedPosition}
-        selectedType={selectedType}
-        setSelectedType={setSelectedType}
-        selectedExperience={selectedExperience}
-        setSelectedExperience={setSelectedExperience}
-        salaryFrom={salaryFrom}
-        setSalaryFrom={setSalaryFrom}
-        salaryTo={salaryTo}
-        setSalaryTo={setSalaryTo}
-        salaryNegotiable={salaryNegotiable}
-        setSalaryNegotiable={setSalaryNegotiable}
-        salaryError={salaryError}
-        validateSalary={validateSalary}
-        showSalaryDropdown={showSalaryDropdown}
-        setShowSalaryDropdown={setShowSalaryDropdown}
-        salaryButtonLabel={salaryButtonLabel}
-        formatInputMoney={formatInputMoney}
-        jobPositions={jobPositions}
-        jobTypes={jobTypes}
-        onClearFilters={() => {
-          setSearchTerm('');
-          setSelectedPosition('');
-          setSalaryFrom('');
-          setSalaryTo('');
-          setSalaryNegotiable(false);
-          setSelectedType('');
-          setSelectedExperience('');
-        }}
-      />
+      {/* Nút mở filter trên mobile */}
+      <Dialog open={showFilter} onOpenChange={setShowFilter}>
+        <DialogTrigger asChild>
+          <button className="block md:hidden w-full bg-blue-600 text-white py-2 rounded mb-4 flex items-center justify-center gap-2">
+            <Filter className="w-5 h-5" /> Bộ lọc
+          </button>
+        </DialogTrigger>
+        <DialogContent className="w-full max-w-md p-4 sm:p-6">
+          <DialogTitle className="font-bold text-lg mb-4">Bộ lọc tìm kiếm</DialogTitle>
+          <div className="space-y-3">
+            {/* Các input/select filter đều w-full, text-sm, gap nhỏ */}
+            <JobFilterBar
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedPosition={selectedPosition}
+              setSelectedPosition={setSelectedPosition}
+              selectedType={selectedType}
+              setSelectedType={setSelectedType}
+              selectedExperience={selectedExperience}
+              setSelectedExperience={setSelectedExperience}
+              salaryFrom={salaryFrom}
+              setSalaryFrom={setSalaryFrom}
+              salaryTo={salaryTo}
+              setSalaryTo={setSalaryTo}
+              salaryNegotiable={salaryNegotiable}
+              setSalaryNegotiable={setSalaryNegotiable}
+              salaryError={salaryError}
+              validateSalary={validateSalary}
+              showSalaryDropdown={showSalaryDropdown}
+              setShowSalaryDropdown={setShowSalaryDropdown}
+              salaryButtonLabel={salaryButtonLabel}
+              formatInputMoney={formatInputMoney}
+              jobPositions={jobPositions}
+              jobTypes={jobTypes}
+              onClearFilters={() => {
+                setSearchTerm('');
+                setSelectedPosition('');
+                setSalaryFrom('');
+                setSalaryTo('');
+                setSalaryNegotiable(false);
+                setSelectedType('');
+                setSelectedExperience('');
+              }}
+            />
+          </div>
+          <button
+            className="mt-6 w-full bg-blue-600 text-white py-2 rounded"
+            onClick={() => setShowFilter(false)}
+          >
+            Đóng
+          </button>
+        </DialogContent>
+      </Dialog>
+      {/* Filter bar gốc chỉ hiện trên desktop */}
+      <div className="hidden md:block">
+        <JobFilterBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedPosition={selectedPosition}
+          setSelectedPosition={setSelectedPosition}
+          selectedType={selectedType}
+          setSelectedType={setSelectedType}
+          selectedExperience={selectedExperience}
+          setSelectedExperience={setSelectedExperience}
+          salaryFrom={salaryFrom}
+          setSalaryFrom={setSalaryFrom}
+          salaryTo={salaryTo}
+          setSalaryTo={setSalaryTo}
+          salaryNegotiable={salaryNegotiable}
+          setSalaryNegotiable={setSalaryNegotiable}
+          salaryError={salaryError}
+          validateSalary={validateSalary}
+          showSalaryDropdown={showSalaryDropdown}
+          setShowSalaryDropdown={setShowSalaryDropdown}
+          salaryButtonLabel={salaryButtonLabel}
+          formatInputMoney={formatInputMoney}
+          jobPositions={jobPositions}
+          jobTypes={jobTypes}
+          onClearFilters={() => {
+            setSearchTerm('');
+            setSelectedPosition('');
+            setSalaryFrom('');
+            setSalaryTo('');
+            setSalaryNegotiable(false);
+            setSelectedType('');
+            setSelectedExperience('');
+          }}
+        />
+      </div>
       {/* Results Count + Pagination Controls */}
       {/* Đầu trang, thay vì justify-between, dùng justify-end và đặt cả hai phần vào 1 flex row, sát phải. */}
       <div className="flex justify-between items-center mb-2 gap-4">
@@ -206,15 +263,14 @@ export default function JobsPage() {
           return (
             <div
               key={job.id}
-              className="bg-white rounded-2xl border border-gray-200 flex items-stretch p-4 gap-6 hover:shadow-lg transition cursor-pointer group"
+              className="bg-white rounded-2xl border border-gray-200 flex md:flex-row flex-col items-stretch p-4 gap-6 hover:shadow-lg transition cursor-pointer group"
               onClick={e => {
-                // Nếu click vào nút ứng tuyển thì không chuyển trang
                 if ((e.target as HTMLElement).closest('button, a')) return;
                 window.location.href = `/dashboard/jobs/${job.id}`;
               }}
             >
               {/* Ảnh đại diện + badge status */}
-              <div className="flex flex-col items-center w-28">
+              <div className="flex flex-col items-center w-28 md:w-28 w-full md:mb-0 mb-2">
                 <div className="w-28 h-28 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-medium border border-gray-200 shrink-0">
                   Không có ảnh
                 </div>
@@ -229,6 +285,7 @@ export default function JobsPage() {
                     {job.status}
                   </span>
                 )}
+                {/* Ngày hạn chót đã chuyển xuống dưới */}
               </div>
               {/* Nội dung chính */}
               <div className="flex-1 flex flex-col gap-2 min-w-0">
@@ -257,7 +314,7 @@ export default function JobsPage() {
                 </div>
               </div>
               {/* Thông tin phụ */}
-              <div className="flex flex-col items-end justify-between min-w-[180px]">
+              <div className="flex flex-col items-end justify-between min-w-[180px] w-full md:w-auto mt-4 md:mt-0">
                 <div className="flex flex-col items-end gap-2">
                   <div className="flex items-center gap-1 text-base font-semibold text-gray-900">
                     <span className="inline-flex items-center gap-1">
@@ -269,16 +326,15 @@ export default function JobsPage() {
                     <Clock className="h-4 w-4" />
                     {job.type}
                   </div>
-                </div>
-                <div className="flex items-center gap-2 mt-4">
-                  <div className="flex items-center gap-1 text-sm text-gray-700">
+                  {/* Ngày hạn chót nằm ngay dưới loại hình công việc */}
+                  <div className="flex items-center gap-1 text-sm text-gray-600">
                     <Calendar className="h-4 w-4" />
-                    <span className="font-semibold">{job.postedDate}</span>
+                    <span className="font-medium">Hạn chót: {job.deadline}</span>
                   </div>
-                  <Link href={`/dashboard/jobs/${job.id}/apply`} onClick={e => e.stopPropagation()}>
-                    <Button
-                      onClick={e => e.stopPropagation()}
-                    >
+                </div>
+                <div className="flex items-center gap-2 mt-4 w-full md:w-auto">
+                  <Link href={`/dashboard/jobs/${job.id}/apply`} onClick={e => e.stopPropagation()} className="w-full md:w-auto">
+                    <Button className="w-full md:w-auto" onClick={e => e.stopPropagation()}>
                       Ứng tuyển ngay
                     </Button>
                   </Link>
