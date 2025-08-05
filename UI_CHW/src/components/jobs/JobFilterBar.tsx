@@ -1,4 +1,5 @@
 import JobSelectFilter from './JobSelectFilter';
+import JobMultiSelectFilter from './JobMultiSelectFilter';
 import JobSalaryFilter from './JobSalaryFilter';
 import { Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -6,8 +7,8 @@ import { Input } from '@/components/ui/input';
 interface JobFilterBarProps {
   searchTerm: string;
   setSearchTerm: (val: string) => void;
-  selectedPosition: string;
-  setSelectedPosition: (val: string) => void;
+  selectedPositions: string[];
+  setSelectedPositions: (val: string[]) => void;
   selectedType: string;
   setSelectedType: (val: string) => void;
   selectedExperience: string;
@@ -31,7 +32,7 @@ interface JobFilterBarProps {
 
 export default function JobFilterBar({
   searchTerm, setSearchTerm,
-  selectedPosition, setSelectedPosition,
+  selectedPositions, setSelectedPositions,
   selectedType, setSelectedType,
   selectedExperience, setSelectedExperience,
   salaryFrom, setSalaryFrom,
@@ -59,9 +60,9 @@ export default function JobFilterBar({
           </span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-21 mt-3 mb-1 items-center">
-          <JobSelectFilter
-            value={selectedPosition}
-            onChange={setSelectedPosition}
+          <JobMultiSelectFilter
+            selectedValues={selectedPositions}
+            onChange={setSelectedPositions}
             options={jobPositions}
             placeholder="Vị trí làm việc"
             widthClass="w-56"

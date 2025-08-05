@@ -38,7 +38,7 @@ export default function JobsPage() {
   const salaryDropdownRef = useRef<HTMLDivElement>(null);
 
   // Di chuyển các useState này lên trước khi dùng trong filter
-  const [selectedPosition, setSelectedPosition] = useState('');
+  const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
   const [salaryFrom, setSalaryFrom] = useState('');
   const [salaryTo, setSalaryTo] = useState('');
   const [salaryNegotiable, setSalaryNegotiable] = useState(false);
@@ -61,7 +61,7 @@ export default function JobsPage() {
   // Lọc job theo filter
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = searchTerm === '' || job.title.toLowerCase().includes(searchTerm.toLowerCase()) || job.company.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPosition = !selectedPosition || selectedPosition === 'Tất cả' || job.position === selectedPosition;
+    const matchesPosition = selectedPositions.length === 0 || selectedPositions.includes('Tất cả') || selectedPositions.includes(job.position);
     const matchesType = !selectedType || selectedType === 'Tất cả' || job.type === selectedType;
     const matchesExperience = !selectedExperience || selectedExperience === 'Tất cả' || job.experience === selectedExperience;
     // Lọc mức lương
@@ -157,8 +157,8 @@ export default function JobsPage() {
             <JobFilterBar
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
-              selectedPosition={selectedPosition}
-              setSelectedPosition={setSelectedPosition}
+              selectedPositions={selectedPositions}
+              setSelectedPositions={setSelectedPositions}
               selectedType={selectedType}
               setSelectedType={setSelectedType}
               selectedExperience={selectedExperience}
@@ -179,7 +179,7 @@ export default function JobsPage() {
               jobTypes={jobTypes}
               onClearFilters={() => {
                 setSearchTerm('');
-                setSelectedPosition('');
+                setSelectedPositions([]);
                 setSalaryFrom('');
                 setSalaryTo('');
                 setSalaryNegotiable(false);
@@ -201,8 +201,8 @@ export default function JobsPage() {
         <JobFilterBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          selectedPosition={selectedPosition}
-          setSelectedPosition={setSelectedPosition}
+          selectedPositions={selectedPositions}
+          setSelectedPositions={setSelectedPositions}
           selectedType={selectedType}
           setSelectedType={setSelectedType}
           selectedExperience={selectedExperience}
@@ -223,7 +223,7 @@ export default function JobsPage() {
           jobTypes={jobTypes}
           onClearFilters={() => {
             setSearchTerm('');
-            setSelectedPosition('');
+            setSelectedPositions([]);
             setSalaryFrom('');
             setSalaryTo('');
             setSalaryNegotiable(false);

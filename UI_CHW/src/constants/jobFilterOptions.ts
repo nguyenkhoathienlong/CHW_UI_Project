@@ -1,5 +1,4 @@
 export const jobPositions = [
-  'Tất cả',
   'Điều dưỡng',
   'Tư vấn sức khỏe',
   'Tầm soát ung thư',

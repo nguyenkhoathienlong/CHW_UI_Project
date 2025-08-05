@@ -48,6 +48,7 @@ const menu: MenuItem[] = [
     children: [
       { label: "Cộng tác viên", icon: Users, href: "/collaborators" },
       { label: "Nhân viên", icon: User, href: "/employees" },
+      { label: "Hợp đồng", icon: User, href: "/contracts" },
     ],
   },
 ];
