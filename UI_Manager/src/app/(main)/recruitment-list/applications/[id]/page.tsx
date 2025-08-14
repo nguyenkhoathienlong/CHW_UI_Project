@@ -74,7 +74,7 @@ const mockApplications = [
     company: 'Bệnh viện Đa khoa Hà Nội',
     location: 'Hà Nội',
     appliedDate: '20/12/2024',
-    status: 'Đang xem xét',
+    status: 'Chờ xử lý',
     statusColor: 'yellow',
     salary: '8.000.000 - 12.000.000',
     form: 'Toàn thời gian',
@@ -95,7 +95,7 @@ const mockApplications = [
     location: 'TP.HCM',
     appliedDate: '18/12/2024',
     status: 'Đã duyệt',
-    statusColor: 'green',
+    statusColor: 'indigo',
     salary: '7.000.000 - 10.000.000',
     form: 'Bán thời gian',
     level: 'Cộng tác viên',
@@ -143,6 +143,49 @@ const mockApplications = [
       'Chứng chỉ sơ cấp cứu'
     ],
     coverLetter: 'Tôi có kiến thức về dịch tễ học và mong muốn được tham gia vào công tác phòng chống dịch bệnh. Với kinh nghiệm thực tế và tinh thần trách nhiệm cao, tôi tin rằng mình có thể đóng góp hiệu quả cho tổ chức.'
+  },
+  {
+    id: 5,
+    candidateId: 1,
+    jobTitle: 'Cộng tác viên y tế cộng đồng',
+    company: 'Bệnh viện Đa khoa Hà Nội',
+    location: 'Hà Nội',
+    appliedDate: '10/12/2024',
+    status: 'Hoàn tất tuyển dụng',
+    statusColor: 'green',
+    salary: '8.000.000 - 12.000.000',
+    form: 'Toàn thời gian',
+    level: 'Cộng tác viên',
+    deadline: '25/12/2024',
+    cv: 'CV_NguyenVanA_Completed.pdf',
+    certificates: [
+      'Chứng chỉ đào tạo cơ bản',
+      'Chứng chỉ sơ cấp cứu',
+      'Chứng chỉ hoàn thành khóa đào tạo'
+    ],
+    coverLetter: 'Tôi đã hoàn thành quá trình tuyển dụng và sẵn sàng bắt đầu công việc. Với kinh nghiệm và kiến thức đã được đào tạo, tôi tin rằng mình có thể đóng góp hiệu quả cho tổ chức.'
+  },
+  {
+    id: 6,
+    candidateId: 1,
+    jobTitle: 'Cộng tác viên y tế cộng đồng',
+    company: 'Bệnh viện Đa khoa Hà Nội',
+    location: 'Hà Nội',
+    appliedDate: '06/12/2024',
+    status: 'Hoàn tất tuyển dụng',
+    statusColor: 'green',
+    salary: '8.000.000 - 12.000.000',
+    form: 'Toàn thời gian',
+    level: 'Cộng tác viên',
+    deadline: '20/12/2024',
+    cv: 'CV_NguyenThiF_Completed.pdf',
+    certificates: [
+      'Chứng chỉ đào tạo cơ bản',
+      'Chứng chỉ sơ cấp cứu',
+      'Chứng chỉ hoàn thành khóa đào tạo',
+      'Chứng chỉ kỹ năng giao tiếp cộng đồng'
+    ],
+    coverLetter: 'Tôi đã hoàn thành toàn bộ quá trình tuyển dụng và đào tạo. Với kiến thức chuyên môn và kỹ năng thực tế đã được trang bị, tôi sẵn sàng đóng góp vào công tác y tế cộng đồng và phục vụ người dân một cách hiệu quả nhất.'
   }
 ];
 
@@ -227,6 +270,7 @@ export default function ApplicationDetailPage() {
             border: "1px solid",
             ...(application.statusColor === 'green' ? { background: "#d1fae5", color: "#059669", borderColor: "#a7f3d0" } :
                  application.statusColor === 'yellow' ? { background: "#fef9c3", color: "#b45309", borderColor: "#fde68a" } :
+                 application.statusColor === 'indigo' ? { background: "#e0e7ff", color: "#4338ca", borderColor: "#c7d2fe" } :
                  { background: "#fee2e2", color: "#dc2626", borderColor: "#fca5a5" })
           }}>
             {application.status}
@@ -553,6 +597,31 @@ export default function ApplicationDetailPage() {
                     >
                       <FileText size={16} />
                       Tạo hợp đồng
+                    </Button>
+                  ) : application.status === "Hoàn tất tuyển dụng" ? (
+                    <Button
+                      style={{ 
+                        width: "100%", 
+                        background: "#059669", 
+                        color: "white", 
+                        border: "none", 
+                        borderRadius: 8, 
+                        padding: "12px 16px", 
+                        fontWeight: 600, 
+                        fontSize: 14,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 8,
+                        cursor: "pointer"
+                      }}
+                      onClick={() => {
+                        // Handle view contract
+                        router.push(`/recruitment-list/applications/${applicationId}/contract`);
+                      }}
+                    >
+                      <FileText size={16} />
+                      Xem hợp đồng
                     </Button>
                   ) : (
                     <>

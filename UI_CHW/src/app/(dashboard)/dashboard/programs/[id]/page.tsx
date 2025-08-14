@@ -1,15 +1,37 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Tag, Calendar, FileText, Users, Info, Download, Activity } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Breadcrumb from "@/components/layout/Breadcrumb";
+import { 
+  ArrowLeft, 
+  Calendar, 
+  FileText, 
+  Users, 
+  Info, 
+  Download, 
+  Activity,
+  MapPin,
+  Clock,
+  User,
+  CheckCircle,
+  AlertCircle,
+  Building,
+  Mail,
+  Globe,
+  MapPin as LocationIcon
+} from "lucide-react";
 
 const mockPrograms = [
   {
     id: "uctc-829102",
     name: "Chương trình tầm soát ung thư cổ tử cung",
+    subtitle: "Chương trình sức khỏe cộng đồng",
     code: "UTCTC-829102",
     type: "Tầm soát & phát hiện sớm bệnh lý",
+    status: "Đang diễn ra",
     logo: "",
     goal: "Phát hiện sớm các dấu hiệu ung thư cổ tử cung ở phụ nữ từ 25-55 tuổi.",
     start: "12/02/2025",
@@ -18,83 +40,363 @@ const mockPrograms = [
     files: [
       { name: "Tài liệu hướng dẫn.pdf", url: "#" },
       { name: "Kế hoạch chương trình.docx", url: "#" },
+      { name: "Báo cáo kết quả.pdf", url: "#" },
     ],
-    members: 12,
+    managementUnit: {
+      code: "BV-001",
+      name: "Bệnh viện Đa khoa Trung ương",
+      email: "info@bvtw.edu.vn",
+      website: "www.bvtw.edu.vn",
+      address: "Số 1 Tràng Thi, Hoàn Kiếm, Hà Nội"
+    },
+    members: [
+      { id: 1, name: "Nguyễn Thị Anh", role: "Cộng tác viên chính", status: "Đang tham gia", activities: 5 },
+      { id: 2, name: "Trần Văn Bình", role: "Cộng tác viên", status: "Đang tham gia", activities: 3 },
+      { id: 3, name: "Lê Thị Cẩm", role: "Cộng tác viên", status: "Đang tham gia", activities: 2 },
+    ],
     activities: [
-      { name: "Tập huấn cộng tác viên", date: "15/02/2025", desc: "Đào tạo kiến thức cơ bản về ung thư cổ tử cung." },
-      { name: "Khám sàng lọc đợt 1", date: "01/03/2025", desc: "Tổ chức khám sàng lọc tại địa phương." },
+      { 
+        id: 1, 
+        name: "Tập huấn cộng tác viên", 
+        date: "15/02/2025", 
+        desc: "Đào tạo kiến thức cơ bản về ung thư cổ tử cung.",
+        collaborator: "Nguyễn Thị Anh",
+        status: "Hoàn thành"
+      },
+      { 
+        id: 2, 
+        name: "Khám sàng lọc đợt 1", 
+        date: "01/03/2025", 
+        desc: "Tổ chức khám sàng lọc tại địa phương.",
+        collaborator: "Trần Văn Bình",
+        status: "Đang thực hiện"
+      },
+      { 
+        id: 3, 
+        name: "Tuyên truyền cộng đồng", 
+        date: "10/03/2025", 
+        desc: "Tổ chức các buổi tuyên truyền tại các xã phường.",
+        collaborator: "Lê Thị Cẩm",
+        status: "Chưa bắt đầu"
+      },
     ],
   },
-  // ... các chương trình khác ...
 ];
 
 export default function ProgramDetailPage() {
   const { id } = useParams();
-  const [tab, setTab] = useState<'info'|'activity'>('info');
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState('info');
   const program = mockPrograms.find(p => p.id === id) || mockPrograms[0];
 
+  const tabs = [
+    { id: 'info', label: 'Thông tin chi tiết', count: null },
+    { id: 'members', label: 'Cộng tác viên', count: program.members.length },
+    { id: 'activities', label: 'Hoạt động', count: program.activities.length },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Hoàn thành':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'Đang diễn ra':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'Chưa bắt đầu':
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+      default:
+        return 'bg-orange-100 text-orange-700 border-orange-200';
+    }
+  };
+
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-gradient-to-br from-white to-blue-50 py-4 px-1">
-      <div className="w-full max-w-5xl flex flex-col gap-4">
-        {/* Tabs */}
-        <div className="flex gap-2 mb-2">
-          <button
-            className={`px-4 py-2 rounded-t-lg font-semibold text-base transition-all ${tab==='info' ? 'bg-blue-600 text-white shadow' : 'bg-white text-blue-700 border-b-2 border-blue-100'}`}
-            onClick={()=>setTab('info')}
-          >Thông tin chương trình</button>
-          <button
-            className={`px-4 py-2 rounded-t-lg font-semibold text-base transition-all ${tab==='activity' ? 'bg-blue-600 text-white shadow' : 'bg-white text-blue-700 border-b-2 border-blue-100'}`}
-            onClick={()=>setTab('activity')}
-          >Hoạt động</button>
-        </div>
-        {/* Card content */}
-        <Card className="w-full p-6 rounded-2xl shadow-lg border border-blue-100 bg-white flex flex-col gap-6">
-          {tab === 'info' ? (
-            <div className="flex flex-col md:flex-row gap-6 w-full">
-              {/* Logo + meta */}
-              <div className="flex flex-col items-center md:items-start gap-3 min-w-[120px]">
-                <div className="w-24 h-24 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center">
-                  <Tag className="w-12 h-12 text-blue-400" />
-                </div>
-                <span className="text-lg font-bold text-blue-700 text-center md:text-left">{program.name}</span>
-                <span className="text-sm text-blue-500 font-medium">{program.code}</span>
-                <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-100 rounded px-2 py-0.5 mt-1"><Tag className="w-4 h-4" /> {program.type}</span>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="py-4">
+            {/* Back Button */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => router.back()}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Quay lại
+            </Button>
+            
+            {/* Title Section */}
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {program.name}
+                </h1>
+                <p className="text-gray-600 mt-2">{program.subtitle}</p>
               </div>
-              {/* Info */}
-              <div className="flex-1 flex flex-col gap-2">
-                <div className="flex flex-wrap gap-4 mb-2">
-                  <span className="inline-flex items-center gap-1 text-sm text-gray-700"><Info className="w-4 h-4 text-blue-400" /> <b>Mục tiêu:</b> {program.goal}</span>
-                  <span className="inline-flex items-center gap-1 text-sm text-gray-700"><Calendar className="w-4 h-4 text-blue-400" /> <b>Thời gian:</b> {program.start} - {program.end}</span>
-                  <span className="inline-flex items-center gap-1 text-sm text-gray-700"><Users className="w-4 h-4 text-blue-400" /> <b>Cộng tác viên:</b> {program.members}</span>
-                </div>
-                <div className="text-base text-gray-800 mb-2"><b>Mô tả chi tiết:</b> {program.desc}</div>
-                <div className="flex flex-col gap-1">
-                  <b className="text-sm text-blue-700 mb-1">Tài liệu đính kèm:</b>
-                  <div className="flex flex-wrap gap-2">
-                    {program.files.map(f => (
-                      <a key={f.name} href={f.url} className="inline-flex items-center gap-1 px-3 py-1 rounded bg-blue-50 border border-blue-100 text-blue-700 text-sm hover:bg-blue-100 transition">
-                        <FileText className="w-4 h-4" /> {f.name} <Download className="w-4 h-4" />
-                      </a>
+
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="border-orange-200 text-orange-700">
+                  {program.status}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="mx-auto px-4 sm:px-6 lg:px-6">
+          <div className="flex gap-8 pl-0">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-2 py-4 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 hover: ${
+                    isActive 
+                      ? "border-blue-600 text-blue-600 font-semibold" 
+                      : "border-transparent text-gray-500 font-medium hover:text-blue-600 hover:border-blue-300"
+                  }`}
+                >
+                  <span className="text-sm">{tab.label}</span>
+                  {tab.count !== null && (
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+                      isActive 
+                        ? "bg-blue-600 text-white" 
+                        : "bg-gray-200 text-gray-500 hover:bg-blue-100 hover:text-blue-600"
+                    }`}>
+                      {tab.count}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="mx-auto py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {activeTab === 'info' && (
+              <div className="space-y-6">
+                {/* Program Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Info className="h-5 w-5 text-blue-600" />
+                      Thông tin chương trình
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Mã chương trình</label>
+                        <p className="text-gray-900 font-medium">{program.code}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Loại chương trình</label>
+                        <p className="text-gray-900">{program.type}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Ngày bắt đầu</label>
+                        <p className="text-gray-900">{program.start}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Ngày kết thúc</label>
+                        <p className="text-gray-900">{program.end}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Mục tiêu</label>
+                      <p className="text-gray-900">{program.goal}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Mô tả chi tiết</label>
+                      <p className="text-gray-900 leading-relaxed">{program.desc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {activeTab === 'members' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    Danh sách cộng tác viên
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {program.members.map((member) => (
+                      <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <User className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900">{member.name}</h4>
+                            <p className="text-sm text-gray-600">{member.role}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="border-green-200 text-green-700">
+                            {member.status}
+                          </Badge>
+                          <span className="text-sm text-gray-600">
+                            {member.activities} hoạt động
+                          </span>
+                        </div>
+                      </div>
                     ))}
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'activities' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-blue-600" />
+                    Danh sách hoạt động
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {program.activities.map((activity) => (
+                      <div key={activity.id} className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900 mb-1">{activity.name}</h4>
+                            <p className="text-sm text-gray-600">{activity.desc}</p>
+                          </div>
+                          <Badge className={getStatusColor(activity.status)}>
+                            {activity.status}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            {activity.date}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <User className="h-4 w-4" />
+                            {activity.collaborator}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Right Column - Sidebar */}
+          <div className="space-y-4">
+            {/* Management Unit Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Building className="h-5 w-5 text-blue-600" />
+                  Thông tin đơn vị quản lý
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Building className="h-4 w-4 text-gray-500" />
+                    Mã cơ quan đơn vị
+                  </label>
+                  <p className="text-gray-900">{program.managementUnit.code}</p>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <b className="text-blue-700 text-lg flex items-center gap-2"><Activity className="w-5 h-5" /> Danh sách hoạt động</b>
-              <ul className="flex flex-col gap-3">
-                {program.activities.map((a, idx) => (
-                  <li key={idx} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 p-3 rounded-lg bg-blue-50 border border-blue-100">
-                    <span className="font-semibold text-blue-700 min-w-[120px] flex items-center gap-1"><Calendar className="w-4 h-4" /> {a.date}</span>
-                    <span className="text-gray-800 flex-1">{a.name}</span>
-                    <span className="text-gray-500 text-sm">{a.desc}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </Card>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Building className="h-4 w-4 text-gray-500" />
+                    Tên cơ quan đơn vị
+                  </label>
+                  <p className="text-gray-900">{program.managementUnit.name}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-500" />
+                    Email
+                  </label>
+                  <p className="text-gray-900">{program.managementUnit.email}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-gray-500" />
+                    Website
+                  </label>
+                  <p className="text-gray-900">{program.managementUnit.website}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <LocationIcon className="h-4 w-4 text-gray-500" />
+                    Địa chỉ
+                  </label>
+                  <p className="text-gray-900">{program.managementUnit.address}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Deployment Time */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-blue-600" />
+                  Thời gian triển khai
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Ngày bắt đầu</label>
+                  <p className="text-gray-900">{program.start}</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Ngày kết thúc</label>
+                  <p className="text-gray-900">{program.end}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Attached Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  Thông tin đính kèm
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {program.files.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-5 w-5 text-gray-400" />
+                        <span className="text-gray-900 text-sm">{file.name}</span>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

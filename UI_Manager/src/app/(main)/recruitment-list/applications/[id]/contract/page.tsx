@@ -241,7 +241,7 @@ export default function ContractCreationPage() {
                 </div>
                 <div>
                   <label className="block text-[14px] font-semibold text-[#374151] mb-1">
-                    Ngày bắt đầu hiệu lực <span className="text-red-500">*</span>
+                    Ngày bắt đầu hợp đồng <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="date"
@@ -263,7 +263,7 @@ export default function ContractCreationPage() {
                 </div>
                 <div>
                   <label className="block text-[14px] font-semibold text-[#374151] mb-1">
-                    Ngày kết thúc
+                    Ngày kết thúc hợp đồng
                   </label>
                   <Input
                     type="date"

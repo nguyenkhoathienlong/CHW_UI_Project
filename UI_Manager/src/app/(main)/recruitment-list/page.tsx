@@ -29,7 +29,7 @@ const mockApplications = [
     project: "Chương trình chăm sóc sức khỏe cộng đồng",
     appliedDate: "2024-06-02",
     status: "Đã duyệt",
-    statusColor: "green",
+    statusColor: "indigo",
   },
   {
     id: 3,
@@ -59,6 +59,16 @@ const mockApplications = [
     project: "Chương trình phòng chống dịch bệnh",
     appliedDate: "2024-06-05",
     status: "Đã duyệt",
+    statusColor: "indigo",
+  },
+  {
+    id: 6,
+    collaboratorId: "CTV106",
+    candidateName: "Nguyễn Thị F",
+    position: "Cộng tác viên y tế cộng đồng",
+    project: "Chương trình phòng chống dịch bệnh",
+    appliedDate: "2024-06-06",
+    status: "Hoàn tất tuyển dụng",
     statusColor: "green",
   },
 ];
@@ -73,6 +83,7 @@ function getStatusBadge(status: string, color: string) {
   if (color === "green") { style = { background: "#d1fae5", color: "#059669" }; icon = <CheckCircle size={15} style={{marginRight:5, color:'#059669'}}/>; }
   if (color === "yellow") { style = { background: "#fef9c3", color: "#b45309" }; icon = <Clock size={15} style={{marginRight:5, color:'#b45309'}}/>; }
   if (color === "red") { style = { background: "#fee2e2", color: "#dc2626" }; icon = <AlertCircle size={15} style={{marginRight:5, color:'#dc2626'}}/>; }
+  if (color === "indigo") { style = { background: "#e0e7ff", color: "#4338ca" }; icon = <CheckCircle size={15} style={{marginRight:5, color:'#4338ca'}}/>; }
   return (
     <span style={{ ...style, fontWeight: 600, borderRadius: 10, padding: "2px 12px 2px 6px", fontSize: 13, display: "inline-flex", alignItems:'center', minWidth: 90, textAlign: "center" }}>{icon}{status}</span>
   );
@@ -97,6 +108,7 @@ export default function ApplicationsListPage() {
   const pending = mockApplications.filter(a => a.status === "Chờ xử lý").length;
   const approved = mockApplications.filter(a => a.status === "Đã duyệt").length;
   const rejected = mockApplications.filter(a => a.status === "Đã từ chối").length;
+  const completed = mockApplications.filter(a => a.status === "Hoàn tất tuyển dụng").length;
 
   // Lọc dữ liệu theo tab đang chọn và các filter
   const filtered = useMemo(() => {
@@ -120,6 +132,8 @@ export default function ApplicationsListPage() {
       filteredData = filteredData.filter(app => app.status === "Đã duyệt");
     } else if (activeTab === "rejected") {
       filteredData = filteredData.filter(app => app.status === "Đã từ chối");
+    } else if (activeTab === "completed") {
+      filteredData = filteredData.filter(app => app.status === "Hoàn tất tuyển dụng");
     }
     // "all" tab hiển thị tất cả
 
@@ -173,15 +187,15 @@ export default function ApplicationsListPage() {
           onClick={() => setActiveTab("approved")}
           className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
             activeTab === "approved" 
-              ? "border-green-600 text-green-600 font-semibold" 
-              : "border-transparent text-gray-500 font-medium hover:text-green-600 hover:border-green-300"
+              ? "border-indigo-600 text-indigo-600 font-semibold" 
+              : "border-transparent text-gray-500 font-medium hover:text-indigo-600 hover:border-indigo-300"
           }`}
         >
           <span className="text-sm">Đã duyệt</span>
           <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
             activeTab === "approved" 
-              ? "bg-green-600 text-white" 
-              : "bg-gray-200 text-gray-500 hover:bg-green-100 hover:text-green-600"
+              ? "bg-indigo-600 text-white" 
+              : "bg-gray-200 text-gray-500 hover:bg-indigo-100 hover:text-indigo-600"
           }`}>
             {approved}
           </div>
@@ -202,6 +216,24 @@ export default function ApplicationsListPage() {
               : "bg-gray-200 text-gray-500 hover:bg-red-100 hover:text-red-600"
           }`}>
             {rejected}
+          </div>
+        </div>
+
+        <div 
+          onClick={() => setActiveTab("completed")}
+          className={`flex items-center gap-2 px-2 py-2 cursor-pointer border-b-4 transition-all duration-200 hover:bg-gray-50 ${
+            activeTab === "completed" 
+              ? "border-green-600 text-green-600 font-semibold" 
+              : "border-transparent text-gray-500 font-medium hover:text-green-600 hover:border-green-300"
+          }`}
+        >
+          <span className="text-sm">Hoàn tất tuyển dụng</span>
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
+            activeTab === "completed" 
+              ? "bg-green-600 text-white" 
+              : "bg-gray-200 text-gray-500 hover:bg-green-100 hover:text-green-600"
+          }`}>
+            {completed}
           </div>
         </div>
       </div>

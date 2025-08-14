@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, FileText, User, Calendar, DollarSign, MapPin, Briefcase, Mail, Phone, Award } from 'lucide-react';
+import { ArrowLeft, FileText, User, Calendar, DollarSign, MapPin, Briefcase, Mail, Phone, Award, CheckCircle, Clock, XCircle, StopCircle } from 'lucide-react';
 import React from 'react';
 
 export interface ContractDetailData {
@@ -42,26 +42,69 @@ export interface ContractDetailData {
   };
 }
 
-export default function ContractDetailView({ data, onBack }: { data: ContractDetailData, onBack: () => void }) {
+function getStatusStyle(status: string) {
+  let style = {};
+  let icon = null;
+  
+  if (status === "Đang hiệu lực") { 
+    style = { background: "#d1fae5", color: "#059669" }; 
+    icon = <CheckCircle size={15} style={{marginRight:5, color:'#059669'}}/>; 
+  }
+  else if (status === "Tạm ngưng") { 
+    style = { background: "#fef9c3", color: "#b45309" }; 
+    icon = <Clock size={15} style={{marginRight:5, color:'#b45309'}}/>; 
+  }
+  else if (status === "Hết hiệu lực") { 
+    style = { background: "#f3f4f6", color: "#6b7280" }; 
+    icon = <XCircle size={15} style={{marginRight:5, color:'#6b7280'}}/>; 
+  }
+  else if (status === "Đã hủy") { 
+    style = { background: "#fee2e2", color: "#dc2626" }; 
+    icon = <XCircle size={15} style={{marginRight:5, color:'#dc2626'}}/>; 
+  }
+  else if (status === "Đã kết thúc sớm") { 
+    style = { background: "#e0e7ff", color: "#7c3aed" }; 
+    icon = <StopCircle size={15} style={{marginRight:5, color:'#7c3aed'}}/>; 
+  }
+  else if (status === "Chờ hiệu lực") { 
+    style = { background: "#dbeafe", color: "#2563eb" }; 
+    icon = <Clock size={15} style={{marginRight:5, color:'#2563eb'}}/>; 
+  }
+  else { 
+    style = { background: "#f3f4f6", color: "#6b7280" }; 
+    icon = <XCircle size={15} style={{marginRight:5, color:'#6b7280'}}/>; 
+  }
+  
+  return { style, icon };
+}
+
+export default function ContractDetailView({ data, onBack, actionsSlot }: { data: ContractDetailData, onBack: () => void, actionsSlot?: React.ReactNode }) {
+  const statusStyle = data.status ? getStatusStyle(data.status) : null;
+  
   return (
     <div style={{ maxWidth: 1500, margin: "0 auto", padding: '10px 10px 0 10px', minHeight: "100vh", borderRadius: 18 }}>
       {/* Tiêu đề + Badge trạng thái */}
       <div style={{ marginBottom: 20, position: 'relative' }}>
         <h1 style={{ fontWeight: 700, fontSize: 26, color: "#222", marginBottom: 5, letterSpacing: -1 }}>Hợp đồng tuyển dụng cộng tác viên</h1>
         <div style={{ color: '#64748b', fontSize: 15 }}>Xem chi tiết hợp đồng lao động cho cộng tác viên đã được tuyển dụng</div>
-        {data.status && (
+        {data.status && statusStyle && (
           <span style={{
             position: 'absolute',
             top: 0,
             right: 0,
-            padding: '5px 15px',
-            borderRadius: 999,
+            padding: '4px 12px',
+            borderRadius: 10,
             fontWeight: 600,
-            fontSize: 12,
-            background: data.status === 'Đang hiệu lực' ? '#bbf7d0' : data.status === 'Hết hiệu lực' ? '#f3f4f6' : data.status === 'Đã ký' ? '#dbeafe' : data.status === 'Chờ ký' ? '#fef9c3' : '#f3f4f6',
-            color: data.status === 'Đang hiệu lực' ? '#15803d' : data.status === 'Hết hiệu lực' ? '#6b7280' : data.status === 'Đã ký' ? '#2563eb' : data.status === 'Chờ ký' ? '#ca8a04' : '#6b7280',
-            marginLeft: 12
-          }}>{data.status}</span>
+            fontSize: 13,
+            display: "inline-flex",
+            alignItems: 'center',
+            minWidth: 100,
+            textAlign: "center",
+            marginLeft: 12,
+            ...statusStyle.style
+          }}>
+            {statusStyle.icon}{data.status}
+          </span>
         )}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", gap: 12 }}>
@@ -97,21 +140,9 @@ export default function ContractDetailView({ data, onBack }: { data: ContractDet
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                    Ngày bắt đầu 
+                    Cấp bậc
                   </label>
-                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.startDate}</div>
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                    Ngày kết thúc
-                  </label>
-                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.endDate}</div>
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                    Ngày ký hợp đồng
-                  </label>
-                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.signDate}</div>
+                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.level}</div>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
@@ -121,9 +152,21 @@ export default function ContractDetailView({ data, onBack }: { data: ContractDet
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                    Cấp bậc
+                    Ngày bắt đầu hợp đồng
                   </label>
-                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.level}</div>
+                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.startDate}</div>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                    Ngày kết thúc hợp đồng
+                  </label>
+                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.endDate}</div>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                    Ngày ký hợp đồng
+                  </label>
+                  <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.signDate}</div>
                 </div>
               </div>
             </div>
@@ -152,7 +195,7 @@ export default function ContractDetailView({ data, onBack }: { data: ContractDet
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
-                    Lịch làm việc
+                    Thời gian làm việc
                   </label>
                   <div style={{ width: "100%", padding: "7px 12px", border: "1px solid #d1d5db", borderRadius: 5, fontSize: 14, background: "#f9fafb", color: "#222", fontWeight: 500 }}>{data.workSchedule}</div>
                 </div>
@@ -297,6 +340,16 @@ export default function ContractDetailView({ data, onBack }: { data: ContractDet
                   </div>
                   <div style={{ color: '#222', fontWeight: 600, fontSize: 13 }}>{data.projectInfo.duration}</div>
                 </div>
+              </div>
+            </Card>
+          )}
+          {actionsSlot && (
+            <Card style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px #0001", border: "1px solid #e5e7eb" }}>
+              <div style={{ padding: "20px 24px 16px 24px" }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#222" }}>Thao tác</div>
+              </div>
+              <div style={{ padding: "0 24px 24px 24px" }}>
+                {actionsSlot}
               </div>
             </Card>
           )}

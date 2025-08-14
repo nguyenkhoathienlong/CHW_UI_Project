@@ -1,5 +1,5 @@
 "use client";
-import { Home, Users, User, LogOut, FileText, ChevronLeft, ChevronRight, Globe, Monitor } from "lucide-react";
+import { Home, Users, User, LogOut, FileText, ChevronLeft, ChevronRight, Globe, Monitor, ScrollText } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import React, { createContext, useContext } from "react";
@@ -48,7 +48,7 @@ const menu: MenuItem[] = [
     children: [
       { label: "Cộng tác viên", icon: Users, href: "/collaborators" },
       { label: "Nhân viên", icon: User, href: "/employees" },
-      { label: "Hợp đồng", icon: User, href: "/contracts" },
+      { label: "Hợp đồng", icon: ScrollText, href: "/contracts" },
     ],
   },
 ];

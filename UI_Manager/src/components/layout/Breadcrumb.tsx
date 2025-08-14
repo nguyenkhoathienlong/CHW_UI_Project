@@ -55,6 +55,7 @@ export default function Breadcrumb() {
       if (seg === "complete-training") label = "Sẵn sàng huy động";
       if (seg === "profile") label = "Hồ sơ cộng tác viên";
       if (seg === "review") label = "Đánh giá";
+      if (seg === "contracts") label = "Hợp đồng";
       return {
         label,
         href: "/" + segments.slice(0, idx + 1).join("/"),

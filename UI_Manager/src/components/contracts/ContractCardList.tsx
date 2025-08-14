@@ -26,8 +26,6 @@ const STATUS_OPTIONS = [
   { label: 'Tất cả', value: '' },
   { label: 'Đang hiệu lực', value: 'Đang hiệu lực' },
   { label: 'Hết hiệu lực', value: 'Hết hiệu lực' },
-  { label: 'Đã ký', value: 'Đã ký' },
-  { label: 'Chờ ký', value: 'Chờ ký' },
 ];
 const PAGE_SIZE = 5;
 

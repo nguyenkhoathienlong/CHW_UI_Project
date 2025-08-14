@@ -22,12 +22,28 @@ export default function Breadcrumb() {
     // Thêm các mapping khác nếu cần
   };
 
+  // Mock data for program names
+  const programNames: Record<string, string> = {
+    "uctc-829102": "Chương trình tầm soát ung thư cổ tử cung",
+    // Thêm các chương trình khác nếu cần
+  };
+
   const crumbs = [
     { label: "Trang chủ", href: "/dashboard" },
     ...segments.slice(1).map((seg, idx) => {
       // Nếu là id (số hoặc mã) ở cuối thì bỏ qua
       const isLast = idx === segments.slice(1).length - 1;
       if (isLast && (/^HD-\d+$/i.test(seg) || /^\d+$/.test(seg))) return null;
+      
+      // Nếu là id sau programs => hiển thị tên chương trình
+      if (segments[1] === 'programs' && idx === 1) {
+        const programName = programNames[seg] || seg;
+        return {
+          label: programName,
+          href: "/" + segments.slice(0, idx + 2).join("/"),
+        };
+      }
+      
       // Nếu là id (số) sau jobs => chi tiết tin tuyển dụng
       if (segments[1] === 'jobs' && idx === 1 && /^\d+$/.test(seg)) {
         return {
